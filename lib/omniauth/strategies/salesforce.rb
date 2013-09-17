@@ -17,12 +17,14 @@ module OmniAuth
         :scope,
         :display,
         :immediate,
-        :state
+        :state,
+        :prompt
       ]
 
       def request_phase
         req = Rack::Request.new(@env)
         options.update(req.params)
+        options[:authorize_params][:prompt] = 'login'
         ua = req.user_agent.to_s
         if !options.has_key?(:display)
           mobile_request = ua.downcase =~ Regexp.new(MOBILE_USER_AGENTS)
@@ -62,7 +64,7 @@ module OmniAuth
         hash.merge!('instance_url' => access_token.params["instance_url"])
         hash.merge!('refresh_token' => access_token.refresh_token) if access_token.refresh_token
         hash
-      end
+      end     
 
       def raw_info
         access_token.options[:mode] = :query
@@ -91,6 +93,10 @@ module OmniAuth
 
     class SalesforcePreRelease < OmniAuth::Strategies::Salesforce
       default_options[:client_options][:site] = 'https://prerellogin.pre.salesforce.com/'
+    end
+
+    class SalesforceDF < OmniAuth::Strategies::Salesforce
+      default_options[:client_options][:site] = 'https://dreamevent.my.salesforce.com/'
     end
 
   end
